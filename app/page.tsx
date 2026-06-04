@@ -9,7 +9,7 @@ export default function Home() {
         <Link href="/login" className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
           Login
         </Link>
-        <Link href="/register" className="bg-gray-200 px-6 py-2 rounded hover:bg-gray-300">
+        <Link href="/register" className="bg-slate-800 text-white px-6 py-2 rounded hover:bg-slate-900">
           Register
         </Link>
       </div>
