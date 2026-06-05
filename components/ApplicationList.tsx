@@ -1,49 +1,73 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { deleteApplication } from '@/app/dashboard/actions';
+import EditApplicationModal from './EditApplicationModal';
 import type { Application } from '@prisma/client';
 
 const STATUS_STYLES: Record<string, string> = {
-  applied: 'bg-blue-100 text-blue-800',
-  interview: 'bg-yellow-100 text-yellow-800',
-  offer: 'bg-green-100 text-green-800',
-  rejected: 'bg-red-100 text-red-800',
+  applied:   'bg-blue-100 text-blue-800',
+  interview: 'bg-amber-100 text-amber-800',
+  offer:     'bg-emerald-100 text-emerald-800',
+  rejected:  'bg-red-100 text-red-800',
 };
 
 function ApplicationCard({ app }: { app: Application }) {
   const [isPending, startTransition] = useTransition();
+  const [editing, setEditing] = useState(false);
 
   function handleDelete(formData: FormData) {
+    if (!confirm(`Delete ${app.company} — ${app.role}?`)) return;
     startTransition(async () => {
       await deleteApplication(formData);
     });
   }
 
   return (
-    <div className={`border rounded p-4 shadow-sm transition-opacity ${isPending ? 'opacity-40' : ''}`}>
-      <h3 className="font-bold text-lg">{app.company}</h3>
-      <p className="text-gray-600 mb-2">{app.role}</p>
-      <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${STATUS_STYLES[app.status] ?? 'bg-gray-100 text-gray-700'}`}>
-        {app.status}
-      </span>
-      {app.notes && (
-        <p className="text-sm text-gray-500 mt-2 line-clamp-2">{app.notes}</p>
+    <>
+      {editing && (
+        <EditApplicationModal app={app} onClose={() => setEditing(false)} />
       )}
-      <p className="text-xs text-gray-400 mt-2">
-        {new Date(app.appliedDate).toLocaleDateString()}
-      </p>
-      <form action={handleDelete} className="mt-2">
-        <input type="hidden" name="id" value={app.id} />
-        <button
-          type="submit"
-          disabled={isPending}
-          className="text-red-500 text-sm hover:underline disabled:opacity-50"
-        >
-          Delete
-        </button>
-      </form>
-    </div>
+
+      <div className={`border rounded-xl p-4 shadow-sm transition-opacity ${isPending ? 'opacity-40' : ''}`}>
+        <div className="flex justify-between items-start mb-1">
+          <h3 className="font-bold text-lg leading-tight">{app.company}</h3>
+          <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${STATUS_STYLES[app.status] ?? 'bg-gray-100 text-gray-700'}`}>
+            {app.status}
+          </span>
+        </div>
+
+        <p className="text-gray-600 mb-2">{app.role}</p>
+
+        {app.notes && (
+          <p className="text-sm text-gray-500 line-clamp-2 mb-2">{app.notes}</p>
+        )}
+
+        <p className="text-xs text-gray-400 mb-3">
+          {new Date(app.appliedDate).toLocaleDateString()}
+        </p>
+
+        <div className="flex gap-3 border-t pt-3">
+          <button
+            onClick={() => setEditing(true)}
+            className="text-sm text-indigo-600 font-medium hover:underline"
+          >
+            Edit
+          </button>
+
+          <form action={handleDelete}>
+            <input type="hidden" name="id" value={app.id} />
+            <button
+              type="submit"
+              disabled={isPending}
+              className="text-sm text-red-500 hover:underline disabled:opacity-50"
+            >
+              Delete
+            </button>
+          </form>
+        </div>
+      </div>
+    </>
   );
 }
 

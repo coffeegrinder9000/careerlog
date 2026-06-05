@@ -8,7 +8,7 @@ export default async function Header() {
   return (
     <header className="bg-white border-b px-6 py-4 flex justify-between items-center">
       <Link href="/" className="font-bold text-xl text-blue-600">
-        CareerLog
+        JobTracker
       </Link>
       <nav className="flex items-center gap-4 text-sm">
         {session?.user ? (
